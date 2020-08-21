@@ -183,11 +183,10 @@ func (s *server) handleSetUser() http.HandlerFunc {
 				},
 			},
 		}
-		db := database.NewModelStorage()
 		for _, player := range playersArray {
-			value, err := db.Model(&models.User{}).Field("ID").Equal(player.ID).Get()
+			_, err := s.db.Model(&models.User{}).Field("ID").Equal(player.ID).Get()
 			if err != nil {
-				db.Model(player).Set()
+				s.db.Model(player).Set()
 				p = player
 			}
 		}
