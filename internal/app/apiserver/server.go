@@ -108,6 +108,12 @@ func (s *server) configureRouter() {
 // 	}
 // }
 
+func (s *server) handleGetUserCase() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
 func (s *server) handleSetUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		p := models.User{}
