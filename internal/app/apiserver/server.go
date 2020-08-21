@@ -38,7 +38,7 @@ type server struct {
 }
 
 func (s *server) init() {
-	playersArray := []models.User{
+	playersArray := []*models.User{
 		{
 			ID: 1,
 			FIuser: models.FIuser{
