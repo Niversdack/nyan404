@@ -191,7 +191,7 @@ func (s *server) handleSetUser() http.HandlerFunc {
 				p = player
 			}
 		}
-		player, err = json.Marshal(p)
+		player, err := json.Marshal(p)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			log.Println(err)
