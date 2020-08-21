@@ -8,10 +8,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Oringik/fastexp/internal/app/model"
-	"github.com/Oringik/fastexp/internal/app/store/teststore"
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"github.com/nyan404/internal/app/model"
+	"github.com/nyan404/internal/app/store/teststore"
 	"github.com/stretchr/testify/assert"
 )
 

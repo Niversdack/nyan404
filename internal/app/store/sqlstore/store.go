@@ -1,8 +1,8 @@
 package sqlstore
 
 import (
-	"github.com/Oringik/fastexp/internal/app/store"
 	"github.com/jmoiron/sqlx"
+	"github.com/nyan404/internal/app/store"
 
 	// pq ...
 	_ "github.com/lib/pq"

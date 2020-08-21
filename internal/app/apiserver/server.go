@@ -6,11 +6,11 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/Oringik/fastexp/internal/app/model"
-	"github.com/Oringik/fastexp/internal/app/store"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/nyan404/internal/app/model"
+	"github.com/nyan404/internal/app/store"
 	"github.com/sirupsen/logrus"
 )
 

@@ -5,9 +5,9 @@ import (
 	"log"
 	"unicode/utf8"
 
-	"github.com/Oringik/fastexp/internal/app/model"
-	"github.com/Oringik/fastexp/internal/app/store"
 	"github.com/lib/pq"
+	"github.com/nyan404/internal/app/model"
+	"github.com/nyan404/internal/app/store"
 )
 
 // UserRepository ...

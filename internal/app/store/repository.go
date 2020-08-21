@@ -1,6 +1,6 @@
 package store
 
-import "github.com/Oringik/fastexp/internal/app/model"
+import "github.com/nyan404/internal/app/model"
 
 // UserRepository ...
 type UserRepository interface {

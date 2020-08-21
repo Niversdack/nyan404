@@ -3,7 +3,7 @@ package model_test
 import (
 	"testing"
 
-	"github.com/Oringik/fastexp/internal/app/model"
+	"github.com/nyan404/internal/app/model"
 	"github.com/stretchr/testify/assert"
 )
 

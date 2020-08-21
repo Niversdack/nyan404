@@ -3,9 +3,9 @@ package sqlstore_test
 import (
 	"testing"
 
-	"github.com/Oringik/fastexp/internal/app/model"
-	"github.com/Oringik/fastexp/internal/app/store"
-	"github.com/Oringik/fastexp/internal/app/store/sqlstore"
+	"github.com/nyan404/internal/app/model"
+	"github.com/nyan404/internal/app/store"
+	"github.com/nyan404/internal/app/store/sqlstore"
 	"github.com/stretchr/testify/assert"
 )
 

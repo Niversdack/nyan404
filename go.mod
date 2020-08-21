@@ -1,4 +1,4 @@
-module github.com/Oringik/fastexp
+module github.com/nyan404
 
 go 1.13
 

@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/BurntSushi/toml"
-	"github.com/Oringik/fastexp/internal/app/apiserver"
+	"github.com/nyan404/internal/app/apiserver"
 )
 
 var (
