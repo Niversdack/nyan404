@@ -37,6 +37,82 @@ type server struct {
 	sessionStore sessions.Store
 }
 
+func (s *server) init() {
+	playersArray := []models.User{
+		{
+			ID: 1,
+			FIuser: models.FIuser{
+				Name:    "Дмитрий",
+				Surname: "Степанов",
+			},
+		},
+		{
+			ID: 2,
+			FIuser: models.FIuser{
+				Name:    "Василий",
+				Surname: "Тапочкин",
+			},
+		},
+		{
+			ID: 3,
+			FIuser: models.FIuser{
+				Name:    "Артем",
+				Surname: "Пупкин",
+			},
+		},
+		{
+			ID: 4,
+			FIuser: models.FIuser{
+				Name:    "Елезавета",
+				Surname: "Орлова",
+			},
+		},
+		{
+			ID: 5,
+			FIuser: models.FIuser{
+				Name:    "Екатерина",
+				Surname: "Коврова",
+			},
+		},
+		{
+			ID: 6,
+			FIuser: models.FIuser{
+				Name:    "Адрей",
+				Surname: "Данник",
+			},
+		},
+		{
+			ID: 7,
+			FIuser: models.FIuser{
+				Name:    "Дарья",
+				Surname: "Дворцова",
+			},
+		},
+		{
+			ID: 8,
+			FIuser: models.FIuser{
+				Name:    "Евгений",
+				Surname: "Мартынов",
+			},
+		},
+		{
+			ID: 9,
+			FIuser: models.FIuser{
+				Name:    "Мария",
+				Surname: "Вишнева",
+			},
+		},
+		{
+			ID: 10,
+			FIuser: models.FIuser{
+				Name:    "Виктория",
+				Surname: "Халтурина",
+			},
+		},
+	}
+	s.db.SetArray(playersArray)
+}
+
 func newServer(sessionStore sessions.Store) *server {
 	s := &server{
 		router:       mux.NewRouter(),
@@ -115,93 +191,17 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 }
 
 func (s *server) handleSetUser() http.HandlerFunc {
+	ID := 1
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := models.User{}
-		playersArray := []models.User{
-			{
-				ID: 1,
-				FIuser: models.FIuser{
-					Name:    "Дмитрий",
-					Surname: "Степанов",
-				},
-			},
-			{
-				ID: 2,
-				FIuser: models.FIuser{
-					Name:    "Василий",
-					Surname: "Тапочкин",
-				},
-			},
-			{
-				ID: 3,
-				FIuser: models.FIuser{
-					Name:    "Артем",
-					Surname: "Пупкин",
-				},
-			},
-			{
-				ID: 4,
-				FIuser: models.FIuser{
-					Name:    "Елезавета",
-					Surname: "Орлова",
-				},
-			},
-			{
-				ID: 5,
-				FIuser: models.FIuser{
-					Name:    "Екатерина",
-					Surname: "Коврова",
-				},
-			},
-			{
-				ID: 6,
-				FIuser: models.FIuser{
-					Name:    "Адрей",
-					Surname: "Данник",
-				},
-			},
-			{
-				ID: 7,
-				FIuser: models.FIuser{
-					Name:    "Дарья",
-					Surname: "Дворцова",
-				},
-			},
-			{
-				ID: 8,
-				FIuser: models.FIuser{
-					Name:    "Евгений",
-					Surname: "Мартынов",
-				},
-			},
-			{
-				ID: 9,
-				FIuser: models.FIuser{
-					Name:    "Мария",
-					Surname: "Вишнева",
-				},
-			},
-			{
-				ID: 10,
-				FIuser: models.FIuser{
-					Name:    "Виктория",
-					Surname: "Халтурина",
-				},
-			},
-		}
-		for _, player := range playersArray {
-			_, err := s.db.Model(&models.User{}).Field("ID").Equal(player.ID).Get()
-			if err != nil {
-				s.db.Model(player).Set()
-				p = player
-			}
-		}
+		var p models.User
+		_, err := s.db.Model(&p).Field("ID").Equal(ID).Get()
 		player, err := json.Marshal(p)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			log.Println(err)
 		}
 		w.WriteHeader(http.StatusOK)
+		ID++
 		NewResponseWriter(player, w)
 	}
 }
