@@ -7,12 +7,11 @@ import (
 	"net/http"
 
 	"github.com/Oringik/nyan404-libs/database"
-	"github.com/Oringik/nyan404-libs/models"
+	models "github.com/Oringik/nyan404-libs/models"
 	"github.com/gorilla/websocket"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/nyan404/internal/app/model"
 	"github.com/nyan404/internal/app/store"
 	"github.com/sirupsen/logrus"
 )
@@ -111,7 +110,7 @@ func (s *server) configureRouter() {
 
 func (s *server) handleSetUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var p interface
+		p := models.User{}
 		playersArray := []models.User{
 			{
 				ID: 1,
@@ -192,13 +191,13 @@ func (s *server) handleSetUser() http.HandlerFunc {
 				p = player
 			}
 		}
-		card, err = json.Marshal()
+		player, err = json.Marshal(p)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			log.Println(err)
 		}
 		w.WriteHeader(http.StatusOK)
-		NewResponseWriter(card, w)
+		NewResponseWriter(player, w)
 	}
 }
 
