@@ -3,11 +3,12 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
+	models "github.com/Oringik/nyan404-libs/tree/master/models"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/nyan404/internal/app/model"
 	"github.com/nyan404/internal/app/store"
 	"github.com/sirupsen/logrus"
 )
@@ -49,81 +50,51 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
-
-	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST", "OPTIONS")
-	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST", "OPTIONS")
+	s.router.HandleFunc("/getCards", s.handleGetCards())
+	s.router.HandleFunc("/sendAnswer", s.handleSendAnswer())
 }
 
-func (s *server) handleUsersCreate() http.HandlerFunc {
-	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		u := &model.User{
-			Email:    req.Email,
-			Password: req.Password,
-		}
-
-		if err := s.store.User().Create(u); err != nil {
-			s.error(w, r, http.StatusUnprocessableEntity, err)
-		}
-
-		s.logger.Info("User" + req.Email + " successfully created!")
-
-		u.Sanitize()
-		s.respond(w, r, http.StatusCreated, u)
-	}
+func generateId() int {
+	return 1
 }
 
-func (s *server) handleSessionsCreate() http.HandlerFunc {
-	type request struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
+func (s *server) handleGetCards() http.HandlerFunc {
+	var userCase *models.UserCase
 	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		u, err := s.store.User().FindByEmail(req.Email)
-		if err != nil || !u.ComparePassword(req.Password) {
-			s.error(w, r, http.StatusUnauthorized, errIncorrectEmailOrPassword)
-			return
-		}
-
-		session, err := s.sessionStore.Get(r, sessionName)
+		err := db.Model(userCase).Field(userCase.ID).Equal(generateId()).Get()
 		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
+			w.WriteHeader(http.StatusBadRequest)
+			log.Println(err)
 		}
-
-		session.Values["user_id"] = u.ID
-		if err := s.sessionStore.Save(r, w, session); err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
+		card, err = json.Marshal(&userCase)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			log.Println(err)
 		}
-
-		s.respond(w, r, http.StatusOK, nil)
+		w.WriteHeader(http.StatusOK)
+		NewResponseWriter(card, w)
 	}
 }
 
-func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
-	s.respond(w, r, code, map[string]string{"error": err.Error()})
-}
-
-func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
-	w.WriteHeader(code)
-	if data != nil {
-		json.NewEncoder(w).Encode(data)
+func (s *server) handleSendAnswer() http.HandlerFunc {
+	type request struct {
+		Answer string `json:"answer"`
+	}
+	var req request
+	return func(w http.ResponseWriter, r *http.Request) {
+		body := NewRequestReader(r)
+		json.Unmarshal(body, &req)
+		err := db.Model(req).Set()
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			log.Println(err)
+		}
+		card, err = json.Marshal()
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			log.Println(err)
+		}
+		w.WriteHeader(http.StatusOK)
+		NewResponseWriter(card, w)
 	}
 }

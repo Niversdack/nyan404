@@ -1,5 +1,8 @@
 github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/Oringik/nyan404-libs v0.0.0-20200821145051-052361ea8ebf h1:Q8t8sfKjVDzplNm/qbma/6cU+ny0qgPtX+go0Qn1eHg=
+github.com/Oringik/nyan404-libs v0.0.0-20200821145051-052361ea8ebf/go.mod h1:/OMKI/Ngd29IjViQFYI3sYhnDcd7W6O1hOj4HOO9dC8=
+github.com/Oringik/nyan404-libs v0.0.0-20200821160258-3c6611f8b6cd h1:ROVNFdTvf6FCqlGQC42sHx7bYXNGbTHv5toxaFn69OI=
 github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 h1:4daAzAu0S6Vi7/lbWECcX0j45yZReDZ56BQsrVBOEEY=
 github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535/go.mod h1:oGkLhpf+kjZl6xBf758TQhh5XrAeiJv/7FRz/2spLIg=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
