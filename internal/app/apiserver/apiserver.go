@@ -1,24 +1,17 @@
 package apiserver
 
 import (
-	"net/http"
-
+	"github.com/Oringik/nyan404-libs/database"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
-	"github.com/nyan404/internal/app/store/sqlstore"
+	"net/http"
 )
 
 // Start ...
 func Start(config *Config) error {
-	db, err := newDB(config.DatabaseURL)
-	if err != nil {
-		return err
-	}
 
-	defer db.Close()
-	store := sqlstore.New(db)
 	sessionStore := sessions.NewCookieStore([]byte(config.SessionKey))
-	srv := newServer(store, sessionStore)
+	srv := newServer(sessionStore)
 
 	srv.logger.Info("Server starting")
 
