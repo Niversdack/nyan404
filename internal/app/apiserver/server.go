@@ -3,14 +3,16 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
-	"github.com/Oringik/nyan404-libs/database"
-	"github.com/Oringik/nyan404-libs/models"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 
+	"github.com/Oringik/nyan404-libs/database"
+	"github.com/Oringik/nyan404-libs/models"
+	"github.com/gorilla/websocket"
+
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/nyan404/internal/app/model"
 	"github.com/nyan404/internal/app/store"
 	"github.com/sirupsen/logrus"
 )
@@ -57,44 +59,138 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) configureRouter() {
 
 	s.router.HandleFunc("/ws", s.serveWs())
-	s.router.HandleFunc("/getCards", s.handleGetCards())
-	s.router.HandleFunc("/sendAnswer", s.handleSendAnswer())
+	// s.router.HandleFunc("/getCards", s.handleGetCards())
+	// s.router.HandleFunc("/sendAnswer", s.handleSendAnswer())
+	s.router.HandleFunc("/setUser", s.handleSetUser())
 }
 
-func generateId() int {
-	return 1
-}
+// func generateId() int {
+// 	return 1
+// }
 
-func (s *server) handleGetCards() http.HandlerFunc {
-	var userCase *models.UserCase
+// func (s *server) handleGetCards() http.HandlerFunc {
+// 	var userCase *models.UserCase
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		err := db.Model(userCase).Field(userCase.ID).Equal(generateId()).Get()
+// 		if err != nil {
+// 			w.WriteHeader(http.StatusBadRequest)
+// 			log.Println(err)
+// 		}
+// 		card, err = json.Marshal(&userCase)
+// 		if err != nil {
+// 			w.WriteHeader(http.StatusBadRequest)
+// 			log.Println(err)
+// 		}
+// 		w.WriteHeader(http.StatusOK)
+// 		NewResponseWriter(card, w)
+// 	}
+// }
+
+// func (s *server) handleSendAnswer() http.HandlerFunc {
+// 	type request struct {
+// 		Answer string `json:"answer"`
+// 	}
+// 	var req request
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		body := NewRequestReader(r)
+// 		json.Unmarshal(body, &req)
+// 		err := db.Model(req).Set()
+// 		if err != nil {
+// 			w.WriteHeader(http.StatusBadRequest)
+// 			log.Println(err)
+// 		}
+// 		card, err = json.Marshal()
+// 		if err != nil {
+// 			w.WriteHeader(http.StatusBadRequest)
+// 			log.Println(err)
+// 		}
+// 		w.WriteHeader(http.StatusOK)
+// 		NewResponseWriter(card, w)
+// 	}
+// }
+
+func (s *server) handleSetUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := db.Model(userCase).Field(userCase.ID).Equal(generateId()).Get()
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			log.Println(err)
+		var p interface
+		playersArray := []models.User{
+			{
+				ID: 1,
+				FIuser: models.FIuser{
+					Name:    "Дмитрий",
+					Surname: "Степанов",
+				},
+			},
+			{
+				ID: 2,
+				FIuser: models.FIuser{
+					Name:    "Василий",
+					Surname: "Тапочкин",
+				},
+			},
+			{
+				ID: 3,
+				FIuser: models.FIuser{
+					Name:    "Артем",
+					Surname: "Пупкин",
+				},
+			},
+			{
+				ID: 4,
+				FIuser: models.FIuser{
+					Name:    "Елезавета",
+					Surname: "Орлова",
+				},
+			},
+			{
+				ID: 5,
+				FIuser: models.FIuser{
+					Name:    "Екатерина",
+					Surname: "Коврова",
+				},
+			},
+			{
+				ID: 6,
+				FIuser: models.FIuser{
+					Name:    "Адрей",
+					Surname: "Данник",
+				},
+			},
+			{
+				ID: 7,
+				FIuser: models.FIuser{
+					Name:    "Дарья",
+					Surname: "Дворцова",
+				},
+			},
+			{
+				ID: 8,
+				FIuser: models.FIuser{
+					Name:    "Евгений",
+					Surname: "Мартынов",
+				},
+			},
+			{
+				ID: 9,
+				FIuser: models.FIuser{
+					Name:    "Мария",
+					Surname: "Вишнева",
+				},
+			},
+			{
+				ID: 10,
+				FIuser: models.FIuser{
+					Name:    "Виктория",
+					Surname: "Халтурина",
+				},
+			},
 		}
-		card, err = json.Marshal(&userCase)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			log.Println(err)
-		}
-		w.WriteHeader(http.StatusOK)
-		NewResponseWriter(card, w)
-	}
-}
-
-func (s *server) handleSendAnswer() http.HandlerFunc {
-	type request struct {
-		Answer string `json:"answer"`
-	}
-	var req request
-	return func(w http.ResponseWriter, r *http.Request) {
-		body := NewRequestReader(r)
-		json.Unmarshal(body, &req)
-		err := db.Model(req).Set()
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			log.Println(err)
+		db := database.NewModelStorage()
+		for _, player := range playersArray {
+			value, err := db.Model(&models.User{}).Field("ID").Equal(player.ID).Get()
+			if err != nil {
+				db.Model(player).Set()
+				p = player
+			}
 		}
 		card, err = json.Marshal()
 		if err != nil {
