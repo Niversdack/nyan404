@@ -1,22 +1,17 @@
 module github.com/nyan404
 
-go 1.13
+go 1.15
 
 require (
-	github.com/BurntSushi/toml v0.3.1
-	github.com/Oringik/nyan404-libs v0.0.0-20200822185551-0bd420bff957
-	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
+	github.com/Oringik/nyan404-libs v0.0.0-20200822194453-ff82a72002c2
+	github.com/asaskevich/govalidator v0.0.0-20200819183940-29e1ff8eb0bb // indirect
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
-	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.2.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/jmoiron/sqlx v1.2.0
-	github.com/lib/pq v1.5.2
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.6.1
-	golang.org/x/crypto v0.0.0-20200429183012-4b2356b1ed79
-	google.golang.org/appengine v1.6.6 // indirect
-	gopkg.in/yaml.v2 v2.2.2 // indirect
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 )
