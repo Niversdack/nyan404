@@ -3,9 +3,9 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math/rand"
 	"net/http"
-	"time"
 
 	"github.com/Oringik/nyan404-libs/helpers"
 
@@ -179,6 +179,7 @@ func (s *server) init() {
 				{
 					ID:       2,
 					AnswerID: 0,
+					CaseID:   0,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Вы стоите за прилавком в крупном супермаркете и видите женщину,которая стоит недалеко от кассы и пытается что-то сделать в телефоне.Она кричит что-то в трубку и жалуется на проблемы со связью.Она хочет дозвониться до мужа,чтобы тот помог ей с покупками.Ваши действия...",
@@ -209,6 +210,7 @@ func (s *server) init() {
 				{
 					ID:       3,
 					AnswerID: 1,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина рассказала,что не может позвонить мужу,так как сеть не ловит.Ваши действия...",
@@ -239,6 +241,7 @@ func (s *server) init() {
 				{
 					ID:       4,
 					AnswerID: 2,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина разозлилась и сказала,что ваш оператор сотовой связи будет таким же...",
@@ -269,6 +272,7 @@ func (s *server) init() {
 				{
 					ID:       5,
 					AnswerID: 3,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Охранник подошел к женщине и начал узнавать,в чем проблема.Затем они подошли вдвоем и сказали,что вы были некомпетентны и просят извинений.",
@@ -299,6 +303,7 @@ func (s *server) init() {
 				{
 					ID:       6,
 					AnswerID: 4,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина приняла предложение.После быстрого звонка она спросила,как она может вас отблагодарить...",
@@ -329,6 +334,7 @@ func (s *server) init() {
 				{
 					ID:       7,
 					AnswerID: 1,
+					CaseID:   6,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина вас выслушивает и выглядит заинтересованной...",
@@ -359,6 +365,7 @@ func (s *server) init() {
 				{
 					ID:       8,
 					AnswerID: 2,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина перезагрузила телефон,но ничего не изменилось",
@@ -507,19 +514,8 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 			normallyUserCases = append(normallyUserCases, userCase.(*models.UserCase))
 		}
 
-		rand.Seed(time.Now().UnixNano())
 		randomIndex := rand.Intn(len(normallyUserCases))
 		pick := normallyUserCases[randomIndex]
-
-		for {
-			if pick.ID == 0 {
-				randomIndex = rand.Intn(len(normallyUserCases))
-				pick = normallyUserCases[randomIndex]
-			} else {
-				break
-			}
-
-		}
 
 		data, err := json.Marshal(pick)
 		if err != nil {
@@ -535,6 +531,10 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 
 func (s *server) handleInitUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if s.currentID > 10 {
+			Response([]byte("Hub is full"), w, http.StatusInternalServerError)
+			return
+		}
 		user, err := s.db.Model(&models.User{}).Field("ID").Equal(s.currentID).Get()
 		if err != nil {
 			Response([]byte(err.Error()), w, http.StatusInternalServerError)
@@ -578,20 +578,27 @@ func (s *server) handlerGetUserCaseByAnswer() http.HandlerFunc {
 
 		normallyUserCase := userCase.(*models.UserCase)
 
+		fmt.Println(normallyUserCase.Cases)
+
 		for _, singleCase := range normallyUserCase.Cases {
-			if singleCase.ID == req.CaseID {
-				if singleCase.AnswerID == req.AnswerID && singleCase.CaseID == req.CaseID {
+			if singleCase.CaseID == req.CaseID {
+				if (singleCase.AnswerID == req.AnswerID) && (singleCase.CaseID == req.CaseID) {
 					data, err := json.Marshal(singleCase)
 					if err != nil {
+						fmt.Println(1)
 						Response([]byte(err.Error()), w, http.StatusInternalServerError)
 						return
 					}
+
+					fmt.Println(2)
 
 					Response(data, w, http.StatusOK)
 					return
 				}
 			}
 		}
+
+		fmt.Println(3)
 
 		Response([]byte("Value not found"), w, http.StatusBadRequest)
 		return
