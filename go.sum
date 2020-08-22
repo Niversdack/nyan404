@@ -13,6 +13,8 @@ github.com/Oringik/nyan404-libs v0.0.0-20200821201950-4ad8ddd6cac5 h1:7P7WfFXPfg
 github.com/Oringik/nyan404-libs v0.0.0-20200821201950-4ad8ddd6cac5/go.mod h1:7jtkgrYPvGcDM4sQV0sS+iI5SCK8mpNZa+XL8Ny69pI=
 github.com/Oringik/nyan404-libs v0.0.0-20200821213929-6683ae35b52a h1:emvQDQ/9VLD9TO/7LJbk+AtvBe3Be6jRal8fZejnh4U=
 github.com/Oringik/nyan404-libs v0.0.0-20200821213929-6683ae35b52a/go.mod h1:7jtkgrYPvGcDM4sQV0sS+iI5SCK8mpNZa+XL8Ny69pI=
+github.com/Oringik/nyan404-libs v0.0.0-20200821222752-0b94d198511e h1:6iBkxdKDruB/2bL4zea5BU/OnGXM58zsZoy3E1mYUfQ=
+github.com/Oringik/nyan404-libs v0.0.0-20200821222752-0b94d198511e/go.mod h1:7jtkgrYPvGcDM4sQV0sS+iI5SCK8mpNZa+XL8Ny69pI=
 github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 h1:4daAzAu0S6Vi7/lbWECcX0j45yZReDZ56BQsrVBOEEY=
 github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535/go.mod h1:oGkLhpf+kjZl6xBf758TQhh5XrAeiJv/7FRz/2spLIg=
 github.com/cosiner/argv v0.1.0/go.mod h1:EusR6TucWKX+zFgtdUsKT2Cvg45K5rtpCcWz4hK06d8=
