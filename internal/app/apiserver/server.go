@@ -766,6 +766,10 @@ type pushAllRequest struct {
 	Score   uint
 }
 
+type Status struct {
+	Status int
+}
+
 func (s *server) handleSendAnswer() http.HandlerFunc {
 	type request struct {
 		UserID     uint `json:"user_id"`
@@ -840,20 +844,28 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 
 		normallyUserCounter.RecountBalance(offset)
 
+		status := &Status{}
+
 		if normallyUserCounter.KindOfBeyond() == helpers.FAIL {
-			Response([]byte("FAIL"), w, http.StatusOK)
+			status.Status = 0
+			data, _ := json.Marshal(status)
+			Response([]byte(data), w, http.StatusOK)
 			return
 		}
 
 		if normallyUserCounter.KindOfBeyond() == helpers.SUCCESS {
-			Response([]byte("SUCCESS"), w, http.StatusOK)
+			status.Status = 1
+			data, _ := json.Marshal(status)
+			Response([]byte(data), w, http.StatusOK)
 			return
 		}
 
 		for _, singleCase := range normallyUserCase.Cases {
 			if singleCase.CaseID == req.CaseID {
 				if (singleCase.AnswerID == req.AnswerID) && (singleCase.CaseID == req.CaseID) {
-					Response([]byte("NOPE"), w, http.StatusOK)
+					status.Status = 2
+					data, _ := json.Marshal(status)
+					Response([]byte(data), w, http.StatusOK)
 					return
 				}
 			}
@@ -861,11 +873,15 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 
 		side := normallyUserCounter.CheckSide()
 		if side == helpers.TOP {
-			Response([]byte("SUCCESS"), w, http.StatusOK)
+			status.Status = 1
+			data, _ := json.Marshal(status)
+			Response([]byte(data), w, http.StatusOK)
 			return
 		}
 
-		Response([]byte("FAIL"), w, http.StatusOK)
+		status.Status = 0
+		data, _ := json.Marshal(status)
+		Response([]byte(data), w, http.StatusOK)
 		return
 
 	}
