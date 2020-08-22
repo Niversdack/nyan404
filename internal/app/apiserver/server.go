@@ -229,12 +229,12 @@ func (s *server) serveWs() http.HandlerFunc {
 		// new goroutines.
 		go client.writePump()
 		go client.readPump()
-		msg := []byte("Let's start to talk something.")
-
-		err = conn.WriteMessage(websocket.TextMessage, msg)
-		if err != nil {
-			log.Println(err)
-		}
+		//msg := []byte("Let's start to talk something.")
+		//
+		//err = conn.WriteMessage(websocket.TextMessage, msg)
+		//if err != nil {
+		//	log.Println(err)
+		//}
 	}
 	// do other stuff...
 }
