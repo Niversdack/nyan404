@@ -38,6 +38,7 @@ type server struct {
 	db           *database.ModelStorage
 	hub          *Hub
 	sessionStore sessions.Store
+	currentID    uint
 }
 
 func (s *server) init() {
@@ -115,7 +116,9 @@ func (s *server) init() {
 	}
 	for _, player := range playersArray {
 		s.db.Model(player).Set()
+
 	}
+
 	userCases := []*models.UserCase{
 		{
 			UserInfo: models.UserInfo{
@@ -172,6 +175,7 @@ func newServer(sessionStore sessions.Store) *server {
 		db:           database.NewModelStorage(),
 		hub:          newHub(),
 		sessionStore: sessionStore,
+		currentID:    0,
 	}
 	s.init()
 	s.configureRouter()
@@ -188,8 +192,9 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/ws", s.serveWs())
 	// s.router.HandleFunc("/getCards", s.handleGetCards())
 	// s.router.HandleFunc("/sendAnswer", s.handleSendAnswer())
-	s.router.HandleFunc("/setUser", s.handleSetUser())
 	s.router.HandleFunc("/getusercase", s.handleGetUserCase())
+	s.router.HandleFunc("/inituser", s.handleInitUser())
+	s.router.HandleFunc("/answer", s.handleSendAnswer())
 }
 
 // func generateId() int {
@@ -238,7 +243,29 @@ func (s *server) configureRouter() {
 // }
 
 func (s *server) handleGetUserCase() http.HandlerFunc {
+	type request struct {
+		UserID uint `json:"user_id"`
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		body := NewRequestReader(r)
+
+		err := json.Unmarshal(body, req)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		ansCounter := helpers.GetAnswerCounter()
+		ansCounter.InitAnswerCounter()
+
+		userCounter := &models.UserCounter{
+			UserID:        req.UserID,
+			AnswerCounter: ansCounter,
+		}
+
+		s.db.Model(userCounter).Set()
+
 		userCases, err := s.db.Model(&models.UserCase{}).GetArray()
 		if err != nil {
 			Response([]byte(err.Error()), w, http.StatusInternalServerError)
@@ -255,6 +282,27 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 		pick := normallyUserCases[randomIndex]
 
 		data, err := json.Marshal(pick)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		Response(data, w, http.StatusOK)
+		return
+
+	}
+}
+
+func (s *server) handleInitUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := s.db.Model(&models.User{}).Field("ID").Equal(s.currentID).Get()
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+		s.currentID++
+
+		data, err := json.Marshal(user)
 		if err != nil {
 			Response([]byte(err.Error()), w, http.StatusInternalServerError)
 			return
@@ -353,7 +401,7 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 			return
 		}
 
-		normallyUserCounter := userCounter.(*models.UserCounter)
+		normallyUserCounter := userCounter.(*models.UserCounter).AnswerCounter
 
 		offset, err := normallyUserCounter.GenerateOffset(answer.Significance)
 		if err != nil {
@@ -376,26 +424,6 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 		Response([]byte("NOPE"), w, http.StatusOK)
 		return
 
-	}
-}
-
-func (s *server) handleSetUser() http.HandlerFunc {
-	ID := 1
-	return func(w http.ResponseWriter, r *http.Request) {
-		var p *models.User
-		value, err := s.db.Model(p).Field("ID").Equal(ID).Get()
-		player, err := json.Marshal(value)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			log.Println(err)
-		}
-		w.WriteHeader(http.StatusOK)
-		if ID == 10 {
-			ID = 1
-		} else {
-			ID++
-		}
-		NewResponseWriter(player, w)
 	}
 }
 
