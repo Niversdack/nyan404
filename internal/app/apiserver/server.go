@@ -110,8 +110,9 @@ func (s *server) init() {
 			},
 		},
 	}
-	s.db.SetArray(playersArray)
-
+	for _, player := range playersArray {
+		s.db.Model(player).Set()
+	}
 	userCases := []*models.UserCase{
 		{
 			UserInfo: models.UserInfo{
@@ -125,7 +126,6 @@ func (s *server) init() {
 				
 			}
 		},
-	}
 }
 
 func newServer(sessionStore sessions.Store) *server {
@@ -136,7 +136,7 @@ func newServer(sessionStore sessions.Store) *server {
 		hub:          newHub(),
 		sessionStore: sessionStore,
 	}
-
+	s.init()
 	s.configureRouter()
 
 	return s
@@ -208,15 +208,19 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 func (s *server) handleSetUser() http.HandlerFunc {
 	ID := 1
 	return func(w http.ResponseWriter, r *http.Request) {
-		var p models.User
-		_, err := s.db.Model(&p).Field("ID").Equal(ID).Get()
-		player, err := json.Marshal(p)
+		var p *models.User
+		value, err := s.db.Model(p).Field("ID").Equal(ID).Get()
+		player, err := json.Marshal(value)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			log.Println(err)
 		}
 		w.WriteHeader(http.StatusOK)
-		ID++
+		if ID == 10 {
+			ID = 1
+		} else {
+			ID++
+		}
 		NewResponseWriter(player, w)
 	}
 }

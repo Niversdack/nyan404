@@ -4,8 +4,8 @@ go 1.13
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/Oringik/nyan404-libs v0.0.0-20200821222752-0b94d198511e
-	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
+	github.com/Oringik/nyan404-libs v0.0.0-20200822080042-e0894dd50cd2
+	github.com/asaskevich/govalidator v0.0.0-20200819183940-29e1ff8eb0bb // indirect
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
