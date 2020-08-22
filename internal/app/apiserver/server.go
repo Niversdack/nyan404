@@ -122,11 +122,13 @@ func (s *server) init() {
 		{
 			ID: 1,
 			UserInfo: models.UserInfo{
-				Name:    "Олег",
-				Surname: "Ромашкин",
-				Gender:  "Мужчина",
-				Age:     21,
-				Job:     models.JOB_POLICEMAN_BOY,
+				Name:      "Олег",
+				PictureID: uint(models.JOB_POLICEMAN_BOY),
+				Surname:   "Ромашкин",
+				Gender:    "Мужчина",
+				Status:    "Свободен",
+				Age:       21,
+				Job:       models.JOB_POLICEMAN_BOY,
 			},
 			Cases: []*models.Case{
 				{
@@ -162,13 +164,15 @@ func (s *server) init() {
 			},
 		},
 		{
-			ID: 2,
+			ID: 1,
 			UserInfo: models.UserInfo{
-				Name:    "Мария",
-				Surname: "Ерошкина",
-				Gender:  "Женщина",
-				Age:     30,
-				Job:     models.JOB_SECRETARY,
+				Name:      "Мария",
+				PictureID: uint(models.JOB_DOCTOR_GIRL),
+				Surname:   "Ерошкина",
+				Gender:    "Женщина",
+				Status:    "Замужем",
+				Age:       29,
+				Job:       models.JOB_DOCTOR_GIRL,
 			},
 			Cases: []*models.Case{
 				{
@@ -201,18 +205,6 @@ func (s *server) init() {
 						},
 					},
 				},
-			},
-		},
-		{
-			ID: 2,
-			UserInfo: models.UserInfo{
-				Name:    "Мария",
-				Surname: "Ерошкина",
-				Gender:  "Женщина",
-				Age:     30,
-				Job:     models.JOB_SECRETARY,
-			},
-			Cases: []*models.Case{
 				{
 					ID:       3,
 					AnswerID: 1,
@@ -243,18 +235,6 @@ func (s *server) init() {
 						},
 					},
 				},
-			},
-		},
-		{
-			ID: 2,
-			UserInfo: models.UserInfo{
-				Name:    "Мария",
-				Surname: "Ерошкина",
-				Gender:  "Женщина",
-				Age:     30,
-				Job:     models.JOB_SECRETARY,
-			},
-			Cases: []*models.Case{
 				{
 					ID:       4,
 					AnswerID: 2,
@@ -285,18 +265,6 @@ func (s *server) init() {
 						},
 					},
 				},
-			},
-		},
-		{
-			ID: 2,
-			UserInfo: models.UserInfo{
-				Name:    "Мария",
-				Surname: "Ерошкина",
-				Gender:  "Женщина",
-				Age:     30,
-				Job:     models.JOB_SECRETARY,
-			},
-			Cases: []*models.Case{
 				{
 					ID:       5,
 					AnswerID: 3,
@@ -327,17 +295,6 @@ func (s *server) init() {
 						},
 					},
 				},
-			},
-		},
-		{
-			UserInfo: models.UserInfo{
-				Name:    "Мария",
-				Surname: "Ерошкина",
-				Gender:  "Женщина",
-				Age:     30,
-				Job:     models.JOB_SECRETARY,
-			},
-			Cases: []*models.Case{
 				{
 					ID:       6,
 					AnswerID: 4,
@@ -368,18 +325,6 @@ func (s *server) init() {
 						},
 					},
 				},
-			},
-		},
-		{
-			ID: 2,
-			UserInfo: models.UserInfo{
-				Name:    "Мария",
-				Surname: "Ерошкина",
-				Gender:  "Женщина",
-				Age:     30,
-				Job:     models.JOB_SECRETARY,
-			},
-			Cases: []*models.Case{
 				{
 					ID:       7,
 					AnswerID: 1,
@@ -410,18 +355,6 @@ func (s *server) init() {
 						},
 					},
 				},
-			},
-		},
-		{
-			ID: 2,
-			UserInfo: models.UserInfo{
-				Name:    "Мария",
-				Surname: "Ерошкина",
-				Gender:  "Женщина",
-				Age:     30,
-				Job:     models.JOB_SECRETARY,
-			},
-			Cases: []*models.Case{
 				{
 					ID:       8,
 					AnswerID: 2,
@@ -454,7 +387,6 @@ func (s *server) init() {
 				},
 			},
 		},
-		{},
 	}
 
 	for _, userCase := range userCases {
