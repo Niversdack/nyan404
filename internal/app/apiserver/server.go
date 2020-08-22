@@ -110,6 +110,7 @@ func (s *server) init() {
 			},
 		},
 	}
+
 	s.db.SetArray(playersArray)
 
 	userCases := []*models.UserCase{
@@ -122,9 +123,40 @@ func (s *server) init() {
 				Job:     models.JOB_POLICEMAN_BOY,
 			},
 			Cases: []*models.Case{
-				
-			}
+				{
+					Description: models.Description{
+						Title: "Крикливый мужчина",
+						Text:  "Вы встречаете мужчину на улицу, кричащего во весь голос. Из обрывков его фраз вы понимаете, что у него проблемы с сотовой связью. Окончательно прояснив для себя ситуацию, вы решаете подойти к молодому человеку и предложить свои услуги, но получаете резко-агрессивное настроение против вас...",
+					},
+					Ans: []models.Answer{
+						{
+							ID:           1,
+							Text:         "Предложить мужчине успокоительное",
+							Significance: -1,
+						},
+						{
+							ID:           2,
+							Text:         "Начать расспрашивать его о случившейся ситуации",
+							Significance: 3,
+						},
+						{
+							ID:           3,
+							Text:         "Вызвать скорую помощь",
+							Significance: -4,
+						},
+						{
+							ID:           4,
+							Text:         "Рассказать о своих услугах",
+							Significance: -2,
+						},
+					},
+				},
+			},
 		},
+	}
+
+	for _, userCase := range userCases {
+		s.db.Model(userCase).Set()
 	}
 }
 
