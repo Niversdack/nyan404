@@ -510,7 +510,9 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 
 		normallyUserCases := []*models.UserCase{}
 
-		for _, userCase := range userCases.([]interface{}) {
+		userCasesInterArray := userCases.([]interface{})
+
+		for _, userCase := range userCasesInterArray {
 			normallyUserCases = append(normallyUserCases, userCase.(*models.UserCase))
 		}
 
@@ -578,27 +580,20 @@ func (s *server) handlerGetUserCaseByAnswer() http.HandlerFunc {
 
 		normallyUserCase := userCase.(*models.UserCase)
 
-		fmt.Println(normallyUserCase.Cases)
-
 		for _, singleCase := range normallyUserCase.Cases {
 			if singleCase.CaseID == req.CaseID {
 				if (singleCase.AnswerID == req.AnswerID) && (singleCase.CaseID == req.CaseID) {
 					data, err := json.Marshal(singleCase)
 					if err != nil {
-						fmt.Println(1)
 						Response([]byte(err.Error()), w, http.StatusInternalServerError)
 						return
 					}
-
-					fmt.Println(2)
 
 					Response(data, w, http.StatusOK)
 					return
 				}
 			}
 		}
-
-		fmt.Println(3)
 
 		Response([]byte("Value not found"), w, http.StatusBadRequest)
 		return
@@ -625,6 +620,7 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 
 		userCase, err := s.db.Model(&models.UserCase{}).Field("ID").Equal(req.UserCaseID).Get()
 		if err != nil {
+			fmt.Println(1)
 			Response([]byte(err.Error()), w, http.StatusInternalServerError)
 			return
 		}
@@ -644,6 +640,7 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 
 		userCounter, err := s.db.Model(&models.UserCounter{}).Field("UserID").Equal(req.UserID).Get()
 		if err != nil {
+			fmt.Println(2)
 			Response([]byte(err.Error()), w, http.StatusInternalServerError)
 			return
 		}
@@ -652,6 +649,7 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 
 		offset, err := normallyUserCounter.GenerateOffset(answer.Significance)
 		if err != nil {
+			fmt.Println(3)
 			Response([]byte(err.Error()), w, http.StatusInternalServerError)
 			return
 		}
