@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/Oringik/nyan404-libs/helpers"
 
@@ -204,7 +205,7 @@ func (s *server) init() {
 			},
 		},
 		{
-			ID: 2,
+			ID: 3,
 			UserInfo: models.UserInfo{
 				Name:    "Мария",
 				Surname: "Ерошкина",
@@ -246,7 +247,7 @@ func (s *server) init() {
 			},
 		},
 		{
-			ID: 2,
+			ID: 4,
 			UserInfo: models.UserInfo{
 				Name:    "Мария",
 				Surname: "Ерошкина",
@@ -288,7 +289,7 @@ func (s *server) init() {
 			},
 		},
 		{
-			ID: 2,
+			ID: 5,
 			UserInfo: models.UserInfo{
 				Name:    "Мария",
 				Surname: "Ерошкина",
@@ -573,8 +574,19 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 			normallyUserCases = append(normallyUserCases, userCase.(*models.UserCase))
 		}
 
+		rand.Seed(time.Now().UnixNano())
 		randomIndex := rand.Intn(len(normallyUserCases))
 		pick := normallyUserCases[randomIndex]
+
+		for {
+			if pick.ID == 0 {
+				randomIndex = rand.Intn(len(normallyUserCases))
+				pick = normallyUserCases[randomIndex]
+			} else {
+				break
+			}
+
+		}
 
 		data, err := json.Marshal(pick)
 		if err != nil {
