@@ -111,6 +111,21 @@ func (s *server) init() {
 		},
 	}
 	s.db.SetArray(playersArray)
+
+	userCases := []*models.UserCase{
+		{
+			UserInfo: models.UserInfo{
+				Name:    "Олег",
+				Surname: "Ромашкин",
+				Gender:  "Мужчина",
+				Age:     21,
+				Job:     models.JOB_POLICEMAN_BOY,
+			},
+			Cases: []*models.Case{
+				
+			}
+		},
+	}
 }
 
 func newServer(sessionStore sessions.Store) *server {
