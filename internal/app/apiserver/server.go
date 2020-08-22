@@ -129,12 +129,13 @@ func (s *server) init() {
 				Gender:    "Мужчина",
 				Status:    "Свободен",
 				Age:       21,
-				Job:       string(models.PIC_POLICEMAN_BOY),
+				Job:       models.JOB_POLICEMAN_BOY,
 			},
 			Cases: []*models.Case{
 				{
 					ID:       1,
 					AnswerID: 0,
+					CaseID:   0,
 					Description: models.Description{
 						Title: "Крикливый мужчина",
 						Text:  "Вы встречаете мужчину на улице, кричащего во весь голос. Из обрывков его фраз вы понимаете, что у него проблемы с сотовой связью. Окончательно прояснив для себя ситуацию, вы решаете подойти к молодому человеку и предложить свои услуги, но получаете резко-агрессивное настроение против вас...",
@@ -173,7 +174,7 @@ func (s *server) init() {
 				Gender:    "Женщина",
 				Status:    "Замужем",
 				Age:       29,
-				Job:       string(models.JOB_DOCTOR_GIRL),
+				Job:       models.JOB_DOCTOR_GIRL,
 			},
 			Cases: []*models.Case{
 				{
@@ -390,6 +391,96 @@ func (s *server) init() {
 							ID:           4,
 							Text:         "Уйти,сказав,что попросите у кого-нибудь телефон,чтобы позвонить",
 							Significance: -2,
+						},
+					},
+				},
+			},
+		},
+		{
+			ID: 3,
+			UserInfo: models.UserInfo{
+				Name:      "Роман",
+				PictureID: uint(models.PIC_MINER),
+				Surname:   "Одьялов",
+				Gender:    "Мужчина",
+				Status:    "Разведен",
+				Age:       40,
+				Job:       models.JOB_MINER,
+			},
+			Cases: []*models.Case{
+				{
+					ID:       1,
+					AnswerID: 0,
+					CaseID:   0,
+					Description: models.Description{
+						Title: "Мужчина и Развод",
+						Text:  "На улице к вам подходит очень уставший мужчина. Он просит позвонить с вашего телефона. Пока он делает звонок, вы подслушываете его разговор. Вы узнаете, что он не смог дозвониться до своей жены из-за сотовой связи, чтобы попросить прощения. Ваши действия после разговора...",
+					},
+					Ans: []models.Answer{
+						{
+							ID:           1,
+							Text:         "Предложить мужчине успокоительное",
+							Significance: -1,
+						},
+						{
+							ID:           2,
+							Text:         "Начать расспрашивать его о случившейся ситуации",
+							Significance: 3,
+						},
+						{
+							ID:           3,
+							Text:         "Предложить позвонить со своего телефона",
+							Significance: 1,
+						},
+						{
+							ID:           4,
+							Text:         "Рассказать о своих услугах",
+							Significance: 3,
+						},
+					},
+				},
+			},
+		},
+		{
+			ID: 4,
+			UserInfo: models.UserInfo{
+				Name:      "Екатерина",
+				PictureID: uint(models.PIC_QUEEN),
+				Surname:   "Великая",
+				Gender:    "Женщина",
+				Status:    "Замужем",
+				Age:       40,
+				Job:       models.JOB_QUEEN,
+			},
+			Cases: []*models.Case{
+				{
+					ID:       1,
+					AnswerID: 0,
+					CaseID:   0,
+					Description: models.Description{
+						Title: "Королевские дела",
+						Text:  "Вы приходите на встречу к королеве для того, чтобы предложить использовать симкарты теле2. Ваши действия... ",
+					},
+					Ans: []models.Answer{
+						{
+							ID:           1,
+							Text:         "Можно сфотографироваться с вами",
+							Significance: -5,
+						},
+						{
+							ID:           2,
+							Text:         "Предложить купить сразу симкарту",
+							Significance: -2,
+						},
+						{
+							ID:           3,
+							Text:         "Рассказать о тарифных планах",
+							Significance: 1,
+						},
+						{
+							ID:           4,
+							Text:         "Рассказать о безопасности использования",
+							Significance: 4,
 						},
 					},
 				},
