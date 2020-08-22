@@ -124,7 +124,7 @@ func (s *server) init() {
 			ID: 1,
 			UserInfo: models.UserInfo{
 				Name:      "Олег",
-				PictureID: uint(models.JOB_POLICEMAN_BOY),
+				PictureID: uint(models.PIC_POLICEMAN_BOY),
 				Surname:   "Ромашкин",
 				Gender:    "Мужчина",
 				Status:    "Свободен",

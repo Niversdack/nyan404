@@ -29,6 +29,8 @@ github.com/Oringik/nyan404-libs v0.0.0-20200822141701-659a8b84ab45 h1:zMvXc8fj/S
 github.com/Oringik/nyan404-libs v0.0.0-20200822141701-659a8b84ab45/go.mod h1:7jtkgrYPvGcDM4sQV0sS+iI5SCK8mpNZa+XL8Ny69pI=
 github.com/Oringik/nyan404-libs v0.0.0-20200822150010-e2bed66a2828 h1:XHJ1yi0e5FvqG4aUTuwtGr4joPvyeuM+SwhecZfveCI=
 github.com/Oringik/nyan404-libs v0.0.0-20200822150010-e2bed66a2828/go.mod h1:7jtkgrYPvGcDM4sQV0sS+iI5SCK8mpNZa+XL8Ny69pI=
+github.com/Oringik/nyan404-libs v0.0.0-20200822185551-0bd420bff957 h1:ckrUIyaOS9bjbq8llfacQLsQVVZtibfIC4Cqvre2j3A=
+github.com/Oringik/nyan404-libs v0.0.0-20200822185551-0bd420bff957/go.mod h1:7jtkgrYPvGcDM4sQV0sS+iI5SCK8mpNZa+XL8Ny69pI=
 github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 h1:4daAzAu0S6Vi7/lbWECcX0j45yZReDZ56BQsrVBOEEY=
 github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535/go.mod h1:oGkLhpf+kjZl6xBf758TQhh5XrAeiJv/7FRz/2spLIg=
 github.com/asaskevich/govalidator v0.0.0-20200819183940-29e1ff8eb0bb h1:kvlW1qyM1aU3xeyeIVTU2jx5fSvjKpsU3aXvuaCMg3Q=
