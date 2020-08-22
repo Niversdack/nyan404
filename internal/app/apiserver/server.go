@@ -3,9 +3,10 @@ package apiserver
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"math/rand"
 	"net/http"
+
+	"github.com/Oringik/nyan404-libs/helpers"
 
 	"github.com/Oringik/nyan404-libs/database"
 	models "github.com/Oringik/nyan404-libs/models"
@@ -36,6 +37,7 @@ type server struct {
 	db           *database.ModelStorage
 	hub          *Hub
 	sessionStore sessions.Store
+	currentID    uint
 }
 
 func (s *server) init() {
@@ -113,7 +115,9 @@ func (s *server) init() {
 	}
 	for _, player := range playersArray {
 		s.db.Model(player).Set()
+
 	}
+
 	userCases := []*models.UserCase{
 		{
 			UserInfo: models.UserInfo{
@@ -430,9 +434,11 @@ func newServer(sessionStore sessions.Store) *server {
 		db:           database.NewModelStorage(),
 		hub:          newHub(),
 		sessionStore: sessionStore,
+		currentID:    0,
 	}
 	s.init()
 	s.configureRouter()
+	go s.hub.run()
 
 	return s
 }
@@ -446,7 +452,9 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/ws", s.serveWs())
 	// s.router.HandleFunc("/getCards", s.handleGetCards())
 	// s.router.HandleFunc("/sendAnswer", s.handleSendAnswer())
-	s.router.HandleFunc("/setUser", s.handleSetUser())
+	s.router.HandleFunc("/getusercase", s.handleGetUserCase())
+	s.router.HandleFunc("/inituser", s.handleInitUser())
+	s.router.HandleFunc("/answer", s.handleSendAnswer())
 }
 
 // func generateId() int {
@@ -495,38 +503,187 @@ func (s *server) configureRouter() {
 // }
 
 func (s *server) handleGetUserCase() http.HandlerFunc {
+	type request struct {
+		UserID uint `json:"user_id"`
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		userCases, err := s.db.Model(&models.UserCase{}).GetArray()
+		req := &request{}
+		body := NewRequestReader(r)
+
+		err := json.Unmarshal(body, req)
 		if err != nil {
-			Response(err.Error(), w, http.StatusInternalServerError)
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
 			return
 		}
-		randomIndex := rand.Intn(len(userCases))
-		pick := userCases[randomIndex].(*models.UserCase)
 
-		Reponse(pick, w, http.StatusOK)
+		ansCounter := helpers.GetAnswerCounter()
+		ansCounter.InitAnswerCounter()
+
+		userCounter := &models.UserCounter{
+			UserID:        req.UserID,
+			AnswerCounter: ansCounter,
+		}
+
+		s.db.Model(userCounter).Set()
+
+		userCases, err := s.db.Model(&models.UserCase{}).GetArray()
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		normallyUserCases := []*models.UserCase{}
+
+		for _, userCase := range userCases.([]interface{}) {
+			normallyUserCases = append(normallyUserCases, userCase.(*models.UserCase))
+		}
+
+		randomIndex := rand.Intn(len(normallyUserCases))
+		pick := normallyUserCases[randomIndex]
+
+		data, err := json.Marshal(pick)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		Response(data, w, http.StatusOK)
 		return
 
 	}
 }
 
-func (s *server) handleSetUser() http.HandlerFunc {
-	ID := 1
+func (s *server) handleInitUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var p *models.User
-		value, err := s.db.Model(p).Field("ID").Equal(ID).Get()
-		player, err := json.Marshal(value)
+		user, err := s.db.Model(&models.User{}).Field("ID").Equal(s.currentID).Get()
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			log.Println(err)
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
 		}
-		w.WriteHeader(http.StatusOK)
-		if ID == 10 {
-			ID = 1
-		} else {
-			ID++
+		s.currentID++
+
+		data, err := json.Marshal(user)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
 		}
-		NewResponseWriter(player, w)
+
+		Response(data, w, http.StatusOK)
+		return
+
+	}
+}
+
+func (s *server) getUserCaseByAnswer() http.HandlerFunc {
+	type request struct {
+		UserCaseID uint `json:"user_case_id"`
+		CaseID     uint `json:"case_id"`
+		AnswerID   uint `json:"answer_id"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		body := NewRequestReader(r)
+
+		err := json.Unmarshal(body, req)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		userCase, err := s.db.Model(&models.UserCase{}).Field("ID").Equal(req.UserCaseID).Get()
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		normallyUserCase := userCase.(*models.UserCase)
+
+		for _, singleCase := range normallyUserCase.Cases {
+			if singleCase.ID == req.CaseID {
+				if singleCase.AnswerID == req.AnswerID {
+					data, err := json.Marshal(singleCase)
+					if err != nil {
+						Response([]byte(err.Error()), w, http.StatusInternalServerError)
+						return
+					}
+
+					Response(data, w, http.StatusOK)
+					return
+				}
+			}
+		}
+
+		Response([]byte("Value not found"), w, http.StatusBadRequest)
+		return
+
+	}
+}
+
+func (s *server) handleSendAnswer() http.HandlerFunc {
+	type request struct {
+		UserID     uint `json:"user_id"`
+		UserCaseID uint `json:"user_case_id"`
+		CaseID     uint `json:"case_id"`
+		AnswerID   uint `json:"answer_id"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		body := NewRequestReader(r)
+
+		err := json.Unmarshal(body, req)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		userCase, err := s.db.Model(&models.UserCase{}).Field("ID").Equal(req.UserCaseID).Get()
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		normallyUserCase := userCase.(*models.UserCase)
+		var answer *models.Answer
+
+		for _, singleCase := range normallyUserCase.Cases {
+			if singleCase.ID == req.CaseID {
+				for _, ans := range singleCase.Ans {
+					if ans.ID == req.AnswerID {
+						answer = &ans
+					}
+				}
+			}
+		}
+
+		userCounter, err := s.db.Model(&models.UserCounter{}).Field("UserID").Equal(req.UserID).Get()
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		normallyUserCounter := userCounter.(*models.UserCounter).AnswerCounter
+
+		offset, err := normallyUserCounter.GenerateOffset(answer.Significance)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		normallyUserCounter.RecountBalance(offset)
+
+		if normallyUserCounter.KindOfBeyond() == helpers.FAIL {
+			Response([]byte("FAIL"), w, http.StatusOK)
+			return
+		}
+
+		if normallyUserCounter.KindOfBeyond() == helpers.SUCCESS {
+			Response([]byte("SUCCESS"), w, http.StatusOK)
+			return
+		}
+
+		Response([]byte("NOPE"), w, http.StatusOK)
+		return
+
 	}
 }
 
@@ -538,27 +695,7 @@ var upgrader = websocket.Upgrader{
 
 func (s *server) serveWs() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//func(s *server) handler(w http.ResponseWriter, r *http.Request) {
-		conn, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		defer conn.Close()
-
-		client := &Client{hub: s.hub, conn: conn, send: make(chan []byte, 256)}
-		client.hub.register <- client
-
-		// Allow collection of memory referenced by the caller by doing all work in
-		// new goroutines.
-		go client.writePump()
-		go client.readPump()
-		//msg := []byte("Let's start to talk something.")
-		//
-		//err = conn.WriteMessage(websocket.TextMessage, msg)
-		//if err != nil {
-		//	log.Println(err)
-		//}
+		serveWs(s.hub, w, r)
 	}
-	// do other stuff...
+
 }
