@@ -7,6 +7,8 @@ import (
 	"math/rand"
 	"net/http"
 
+	"github.com/Oringik/nyan404-libs/helpers"
+
 	"github.com/Oringik/nyan404-libs/database"
 	models "github.com/Oringik/nyan404-libs/models"
 	"github.com/gorilla/websocket"
@@ -277,11 +279,13 @@ func (s *server) getUserCaseByAnswer() http.HandlerFunc {
 		err := json.Unmarshal(body, req)
 		if err != nil {
 			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
 		}
 
 		userCase, err := s.db.Model(&models.UserCase{}).Field("ID").Equal(req.UserCaseID).Get()
 		if err != nil {
 			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
 		}
 
 		normallyUserCase := userCase.(*models.UserCase)
@@ -292,14 +296,17 @@ func (s *server) getUserCaseByAnswer() http.HandlerFunc {
 					data, err := json.Marshal(singleCase)
 					if err != nil {
 						Response([]byte(err.Error()), w, http.StatusInternalServerError)
+						return
 					}
 
 					Response(data, w, http.StatusOK)
+					return
 				}
 			}
 		}
 
 		Response([]byte("Value not found"), w, http.StatusBadRequest)
+		return
 
 	}
 }
@@ -315,7 +322,59 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 		req := &request{}
 		body := NewRequestReader(r)
 
-		json.Unmarshal(body, req)
+		err := json.Unmarshal(body, req)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		userCase, err := s.db.Model(&models.UserCase{}).Field("ID").Equal(req.UserCaseID).Get()
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		normallyUserCase := userCase.(*models.UserCase)
+		var answer *models.Answer
+
+		for _, singleCase := range normallyUserCase.Cases {
+			if singleCase.ID == req.CaseID {
+				for _, ans := range singleCase.Ans {
+					if ans.ID == req.AnswerID {
+						answer = &ans
+					}
+				}
+			}
+		}
+
+		userCounter, err := s.db.Model(&models.UserCounter{}).Field("UserID").Equal(req.UserID).Get()
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		normallyUserCounter := userCounter.(*models.UserCounter)
+
+		offset, err := normallyUserCounter.GenerateOffset(answer.Significance)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		normallyUserCounter.RecountBalance(offset)
+
+		if normallyUserCounter.KindOfBeyond() == helpers.FAIL {
+			Response([]byte("FAIL"), w, http.StatusOK)
+			return
+		}
+
+		if normallyUserCounter.KindOfBeyond() == helpers.SUCCESS {
+			Response([]byte("SUCCESS"), w, http.StatusOK)
+			return
+		}
+
+		Response([]byte("NOPE"), w, http.StatusOK)
+		return
 
 	}
 }
