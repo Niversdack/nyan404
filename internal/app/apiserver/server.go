@@ -583,6 +583,14 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 			return
 		}
 
+		_, err = s.db.Model(&models.UserCounter{}).Field("UserID").Equal(req.UserID).Get()
+		if err == nil {
+			err := s.db.Model(&models.UserCounter{}).Field("UserID").Equal(req.UserID).Delete()
+			if err != nil {
+				Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			}
+		}
+
 		ansCounter := helpers.GetAnswerCounter()
 		ansCounter.InitAnswerCounter()
 
