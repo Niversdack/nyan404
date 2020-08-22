@@ -178,6 +178,7 @@ func (s *server) init() {
 				{
 					ID:       2,
 					AnswerID: 0,
+					CaseID:   0,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Вы стоите за прилавком в крупном супермаркете и видите женщину,которая стоит недалеко от кассы и пытается что-то сделать в телефоне.Она кричит что-то в трубку и жалуется на проблемы со связью.Она хочет дозвониться до мужа,чтобы тот помог ей с покупками.Ваши действия...",
@@ -208,6 +209,7 @@ func (s *server) init() {
 				{
 					ID:       3,
 					AnswerID: 1,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина рассказала,что не может позвонить мужу,так как сеть не ловит.Ваши действия...",
@@ -238,6 +240,7 @@ func (s *server) init() {
 				{
 					ID:       4,
 					AnswerID: 2,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина разозлилась и сказала,что ваш оператор сотовой связи будет таким же...",
@@ -268,6 +271,7 @@ func (s *server) init() {
 				{
 					ID:       5,
 					AnswerID: 3,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Охранник подошел к женщине и начал узнавать,в чем проблема.Затем они подошли вдвоем и сказали,что вы были некомпетентны и просят извинений.",
@@ -298,6 +302,7 @@ func (s *server) init() {
 				{
 					ID:       6,
 					AnswerID: 4,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина приняла предложение.После быстрого звонка она спросила,как она может вас отблагодарить...",
@@ -328,6 +333,7 @@ func (s *server) init() {
 				{
 					ID:       7,
 					AnswerID: 1,
+					CaseID:   6,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина вас выслушивает и выглядит заинтересованной...",
@@ -358,6 +364,7 @@ func (s *server) init() {
 				{
 					ID:       8,
 					AnswerID: 2,
+					CaseID:   2,
 					Description: models.Description{
 						Title: "Женщина и Покупки",
 						Text:  "Женщина перезагрузила телефон,но ничего не изменилось",
