@@ -125,6 +125,8 @@ func (s *server) init() {
 			},
 			Cases: []*models.Case{
 				{
+					ID:       1,
+					AnswerID: 0,
 					Description: models.Description{
 						Title: "Крикливый мужчина",
 						Text:  "Вы встречаете мужчину на улицу, кричащего во весь голос. Из обрывков его фраз вы понимаете, что у него проблемы с сотовой связью. Окончательно прояснив для себя ситуацию, вы решаете подойти к молодому человеку и предложить свои услуги, но получаете резко-агрессивное настроение против вас...",
@@ -185,6 +187,7 @@ func (s *server) configureRouter() {
 	// s.router.HandleFunc("/getCards", s.handleGetCards())
 	// s.router.HandleFunc("/sendAnswer", s.handleSendAnswer())
 	s.router.HandleFunc("/setUser", s.handleSetUser())
+	s.router.HandleFunc("/getusercase", s.handleGetUserCase())
 }
 
 // func generateId() int {
@@ -236,14 +239,83 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userCases, err := s.db.Model(&models.UserCase{}).GetArray()
 		if err != nil {
-			Response(err.Error(), w, http.StatusInternalServerError)
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
 			return
 		}
-		randomIndex := rand.Intn(len(userCases))
-		pick := userCases[randomIndex].(*models.UserCase)
 
-		Reponse(pick, w, http.StatusOK)
+		normallyUserCases := []*models.UserCase{}
+
+		for _, userCase := range userCases.([]interface{}) {
+			normallyUserCases = append(normallyUserCases, userCase.(*models.UserCase))
+		}
+
+		randomIndex := rand.Intn(len(normallyUserCases))
+		pick := normallyUserCases[randomIndex]
+
+		data, err := json.Marshal(pick)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+			return
+		}
+
+		Response(data, w, http.StatusOK)
 		return
+
+	}
+}
+
+func (s *server) getUserCaseByAnswer() http.HandlerFunc {
+	type request struct {
+		UserCaseID uint `json:"user_case_id"`
+		CaseID     uint `json:"case_id"`
+		AnswerID   uint `json:"answer_id"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		body := NewRequestReader(r)
+
+		err := json.Unmarshal(body, req)
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+		}
+
+		userCase, err := s.db.Model(&models.UserCase{}).Field("ID").Equal(req.UserCaseID).Get()
+		if err != nil {
+			Response([]byte(err.Error()), w, http.StatusInternalServerError)
+		}
+
+		normallyUserCase := userCase.(*models.UserCase)
+
+		for _, singleCase := range normallyUserCase.Cases {
+			if singleCase.ID == req.CaseID {
+				if singleCase.AnswerID == req.AnswerID {
+					data, err := json.Marshal(singleCase)
+					if err != nil {
+						Response([]byte(err.Error()), w, http.StatusInternalServerError)
+					}
+
+					Response(data, w, http.StatusOK)
+				}
+			}
+		}
+
+		Response([]byte("Value not found"), w, http.StatusBadRequest)
+
+	}
+}
+
+func (s *server) handleSendAnswer() http.HandlerFunc {
+	type request struct {
+		UserID     uint `json:"user_id"`
+		UserCaseID uint `json:"user_case_id"`
+		CaseID     uint `json:"case_id"`
+		AnswerID   uint `json:"answer_id"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		body := NewRequestReader(r)
+
+		json.Unmarshal(body, req)
 
 	}
 }

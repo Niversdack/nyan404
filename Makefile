@@ -3,6 +3,12 @@ build:
 
 		go build -v ./cmd/apiserver
 
+
+.PHONY: build-linux
+build-linux:
+
+		env GOOS=linux go build -v ./cmd/apiserver
+
 .PHONY: test
 test:
 
