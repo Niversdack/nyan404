@@ -804,13 +804,14 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 					}
 				}
 			}
-		}
+		} else {
 
-		for _, singleCase := range normallyUserCase.Cases {
-			if singleCase.CaseID == req.CaseID {
-				for _, ans := range singleCase.Ans {
-					if (singleCase.AnswerID == req.AnswerID) && (ans.Significance != 0) {
-						answer = ans
+			for _, singleCase := range normallyUserCase.Cases {
+				if singleCase.CaseID == req.CaseID {
+					for _, ans := range singleCase.Ans {
+						if (singleCase.AnswerID == req.AnswerID) && (ans.Significance != 0) {
+							answer = ans
+						}
 					}
 				}
 			}
@@ -849,7 +850,22 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 			return
 		}
 
-		Response([]byte("NOPE"), w, http.StatusOK)
+		for _, singleCase := range normallyUserCase.Cases {
+			if singleCase.CaseID == req.CaseID {
+				if (singleCase.AnswerID == req.AnswerID) && (singleCase.CaseID == req.CaseID) {
+					Response([]byte("NOPE"), w, http.StatusOK)
+					return
+				}
+			}
+		}
+
+		side := normallyUserCounter.CheckSide()
+		if side == helpers.TOP {
+			Response([]byte("SUCCESS"), w, http.StatusOK)
+			return
+		}
+
+		Response([]byte("FAIL"), w, http.StatusOK)
 		return
 
 	}
