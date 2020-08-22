@@ -587,9 +587,12 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 		if err == nil {
 			err := s.db.Model(&models.UserCounter{}).Field("UserID").Equal(req.UserID).Delete()
 			if err != nil {
+				fmt.Println(1)
 				Response([]byte(err.Error()), w, http.StatusInternalServerError)
+				return
 			}
 		}
+		err = nil
 
 		ansCounter := helpers.GetAnswerCounter()
 		ansCounter.InitAnswerCounter()
@@ -603,6 +606,7 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 
 		userCases, err := s.db.Model(&models.UserCase{}).GetArray()
 		if err != nil {
+			fmt.Println(2)
 			Response([]byte(err.Error()), w, http.StatusInternalServerError)
 			return
 		}
@@ -736,6 +740,8 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 				}
 			}
 		}
+
+		fmt.Println(answer)
 
 		userCounter, err := s.db.Model(&models.UserCounter{}).Field("UserID").Equal(req.UserID).Get()
 		if err != nil {
