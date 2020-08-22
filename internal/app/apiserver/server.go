@@ -434,7 +434,7 @@ func newServer(sessionStore sessions.Store) *server {
 		db:           database.NewModelStorage(),
 		hub:          newHub(),
 		sessionStore: sessionStore,
-		currentID:    0,
+		currentID:    1,
 	}
 	s.init()
 	s.configureRouter()
@@ -452,9 +452,9 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/ws", s.serveWs())
 	// s.router.HandleFunc("/getCards", s.handleGetCards())
 	// s.router.HandleFunc("/sendAnswer", s.handleSendAnswer())
-	s.router.HandleFunc("/getusercase", s.handleGetUserCase())
-	s.router.HandleFunc("/inituser", s.handleInitUser())
-	s.router.HandleFunc("/answer", s.handleSendAnswer())
+	s.router.HandleFunc("/getusercase", s.handleGetUserCase()).Methods("POST")
+	s.router.HandleFunc("/inituser", s.handleInitUser()).Methods("GET")
+	s.router.HandleFunc("/answer", s.handleSendAnswer()).Methods("POST")
 }
 
 // func generateId() int {
