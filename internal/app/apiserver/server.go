@@ -175,6 +175,7 @@ func newServer(sessionStore sessions.Store) *server {
 	}
 	s.init()
 	s.configureRouter()
+	go s.hub.run()
 
 	return s
 }
@@ -407,27 +408,7 @@ var upgrader = websocket.Upgrader{
 
 func (s *server) serveWs() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//func(s *server) handler(w http.ResponseWriter, r *http.Request) {
-		conn, err := upgrader.Upgrade(w, r, nil)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		defer conn.Close()
-
-		client := &Client{hub: s.hub, conn: conn, send: make(chan []byte, 256)}
-		client.hub.register <- client
-
-		// Allow collection of memory referenced by the caller by doing all work in
-		// new goroutines.
-		go client.writePump()
-		go client.readPump()
-		//msg := []byte("Let's start to talk something.")
-		//
-		//err = conn.WriteMessage(websocket.TextMessage, msg)
-		//if err != nil {
-		//	log.Println(err)
-		//}
+		serveWs(s.hub, w, r)
 	}
-	// do other stuff...
+
 }
