@@ -3,6 +3,7 @@ package apiserver
 import (
 	"bytes"
 	"log"
+	"net/http"
 
 	"time"
 
@@ -81,7 +82,7 @@ func (c *Client) writePump() {
 		case message, ok := <-c.send:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				// The hub closed the channel.
+
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
@@ -109,4 +110,18 @@ func (c *Client) writePump() {
 			}
 		}
 	}
+}
+func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client.hub.register <- client
+
+	// Allow collection of memory referenced by the caller by doing all work in
+	// new goroutines.
+	go client.writePump()
+	go client.readPump()
 }
