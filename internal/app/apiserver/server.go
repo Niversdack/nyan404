@@ -402,12 +402,12 @@ func (s *server) init() {
 	}
 }
 
-func newServer(sessionStore sessions.Store) *server {
+func newServer(sessionStore sessions.Store, hub *Hub) *server {
 	s := &server{
 		router:       mux.NewRouter(),
 		logger:       logrus.New(),
 		db:           database.NewModelStorage(),
-		hub:          newHub(),
+		hub:          hub,
 		sessionStore: sessionStore,
 		currentID:    1,
 	}

@@ -11,7 +11,17 @@ import (
 func Start(config *Config) error {
 
 	sessionStore := sessions.NewCookieStore([]byte(config.SessionKey))
-	srv := newServer(sessionStore)
+
+	hub := &Hub{
+		clients:    make(map[*Client]bool),
+		broadcast:  make(chan []byte),
+		register:   make(chan *Client),
+		unregister: make(chan *Client),
+	}
+
+	go hub.run()
+
+	srv := newServer(sessionStore, hub)
 
 	srv.logger.Info("Server starting")
 
