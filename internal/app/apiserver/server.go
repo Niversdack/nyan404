@@ -129,7 +129,7 @@ func (s *server) init() {
 				Gender:    "Мужчина",
 				Status:    "Свободен",
 				Age:       21,
-				Job:       models.JOB_POLICEMAN_BOY,
+				Job:       string(models.PIC_POLICEMAN_BOY),
 			},
 			Cases: []*models.Case{
 				{
@@ -168,12 +168,12 @@ func (s *server) init() {
 			ID: 2,
 			UserInfo: models.UserInfo{
 				Name:      "Мария",
-				PictureID: uint(models.JOB_DOCTOR_GIRL),
+				PictureID: uint(models.PIC_DOCTOR_GIRL),
 				Surname:   "Ерошкина",
 				Gender:    "Женщина",
 				Status:    "Замужем",
 				Age:       29,
-				Job:       models.JOB_DOCTOR_GIRL,
+				Job:       string(models.JOB_DOCTOR_GIRL),
 			},
 			Cases: []*models.Case{
 				{
