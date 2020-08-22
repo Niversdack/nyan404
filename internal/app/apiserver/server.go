@@ -698,6 +698,17 @@ func (s *server) handleInitUser() http.HandlerFunc {
 			return
 		}
 
+		score := &models.SingleScore{
+			UserID: user.(*models.User).ID,
+			FIscore: models.FIscore{
+				Firstname: user.(*models.User).Name,
+				Lastname:  user.(*models.User).Surname,
+			},
+			Score: 0,
+		}
+
+		s.db.Model(score).Set()
+
 		Response(data, w, http.StatusOK)
 		return
 
@@ -749,12 +760,19 @@ func (s *server) handlerGetUserCaseByAnswer() http.HandlerFunc {
 	}
 }
 
+type pushAllRequest struct {
+	Name    string
+	Surname string
+	Score   uint
+}
+
 func (s *server) handleSendAnswer() http.HandlerFunc {
 	type request struct {
 		UserID     uint `json:"user_id"`
 		UserCaseID uint `json:"user_case_id"`
 		CaseID     uint `json:"case_id"`
 		AnswerID   uint `json:"answer_id"`
+		Root       bool `json:"root"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &request{}
@@ -774,19 +792,34 @@ func (s *server) handleSendAnswer() http.HandlerFunc {
 		}
 
 		normallyUserCase := userCase.(*models.UserCase)
-		var answer *models.Answer
+		var answer models.Answer
 
-		for _, singleCase := range normallyUserCase.Cases {
-			if singleCase.ID == req.CaseID {
-				for _, ans := range singleCase.Ans {
-					if ans.ID == req.AnswerID {
-						answer = &ans
+		if req.Root {
+			for _, singleCase := range normallyUserCase.Cases {
+				if singleCase.ID == req.CaseID {
+					for _, ans := range singleCase.Ans {
+						if (ans.ID == req.AnswerID) && (ans.Significance != 0) {
+							answer = ans
+						}
 					}
 				}
 			}
 		}
 
-		fmt.Println(answer)
+		for _, singleCase := range normallyUserCase.Cases {
+			if singleCase.CaseID == req.CaseID {
+				for _, ans := range singleCase.Ans {
+					if (singleCase.AnswerID == req.AnswerID) && (ans.Significance != 0) {
+						answer = ans
+					}
+				}
+			}
+		}
+
+		if answer.Significance == 0 {
+			Response([]byte("Value not found"), w, http.StatusInternalServerError)
+			return
+		}
 
 		userCounter, err := s.db.Model(&models.UserCounter{}).Field("UserID").Equal(req.UserID).Get()
 		if err != nil {
