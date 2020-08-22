@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"math/rand"
 	"net/http"
 
 	"github.com/Oringik/nyan404-libs/database"
@@ -110,9 +111,9 @@ func (s *server) init() {
 			},
 		},
 	}
-
-	s.db.SetArray(playersArray)
-
+	for _, player := range playersArray {
+		s.db.Model(player).Set()
+	}
 	userCases := []*models.UserCase{
 		{
 			UserInfo: models.UserInfo{
@@ -168,7 +169,7 @@ func newServer(sessionStore sessions.Store) *server {
 		hub:          newHub(),
 		sessionStore: sessionStore,
 	}
-
+	s.init()
 	s.configureRouter()
 
 	return s
@@ -233,6 +234,16 @@ func (s *server) configureRouter() {
 
 func (s *server) handleGetUserCase() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		userCases, err := s.db.Model(&models.UserCase{}).GetArray()
+		if err != nil {
+			Response(err.Error(), w, http.StatusInternalServerError)
+			return
+		}
+		randomIndex := rand.Intn(len(userCases))
+		pick := userCases[randomIndex].(*models.UserCase)
+
+		Reponse(pick, w, http.StatusOK)
+		return
 
 	}
 }
@@ -240,15 +251,19 @@ func (s *server) handleGetUserCase() http.HandlerFunc {
 func (s *server) handleSetUser() http.HandlerFunc {
 	ID := 1
 	return func(w http.ResponseWriter, r *http.Request) {
-		var p models.User
-		_, err := s.db.Model(&p).Field("ID").Equal(ID).Get()
-		player, err := json.Marshal(p)
+		var p *models.User
+		value, err := s.db.Model(p).Field("ID").Equal(ID).Get()
+		player, err := json.Marshal(value)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			log.Println(err)
 		}
 		w.WriteHeader(http.StatusOK)
-		ID++
+		if ID == 10 {
+			ID = 1
+		} else {
+			ID++
+		}
 		NewResponseWriter(player, w)
 	}
 }
@@ -276,12 +291,12 @@ func (s *server) serveWs() http.HandlerFunc {
 		// new goroutines.
 		go client.writePump()
 		go client.readPump()
-		msg := []byte("Let's start to talk something.")
-
-		err = conn.WriteMessage(websocket.TextMessage, msg)
-		if err != nil {
-			log.Println(err)
-		}
+		//msg := []byte("Let's start to talk something.")
+		//
+		//err = conn.WriteMessage(websocket.TextMessage, msg)
+		//if err != nil {
+		//	log.Println(err)
+		//}
 	}
 	// do other stuff...
 }
