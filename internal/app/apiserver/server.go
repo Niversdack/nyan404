@@ -486,6 +486,51 @@ func (s *server) init() {
 				},
 			},
 		},
+		{
+			ID: 5,
+			UserInfo: models.UserInfo{
+				Name:      "Мария",
+				PictureID: uint(models.PIC_SECRETARY),
+				Surname:   "Гончарова",
+				Gender:    "Женщина",
+				Status:    "Свободна",
+				Age:       26,
+				Job:       models.JOB_SECRETARY,
+			},
+			Cases: []*models.Case{
+				{
+					ID:       1,
+					AnswerID: 0,
+					CaseID:   0,
+					Description: models.Description{
+						Title: "Дела в офисе",
+						Text:  "Вы узнали, что в вашем офисе одна секретарша не пользуется симкартой теле2. Ваши действия...",
+					},
+					Ans: []models.Answer{
+						{
+							ID:           1,
+							Text:         "Позвать ее домой на чашечку чая",
+							Significance: 1,
+						},
+						{
+							ID:           2,
+							Text:         "Прегрозить увольнением",
+							Significance: -4,
+						},
+						{
+							ID:           3,
+							Text:         "Рассказать о тарифных планах",
+							Significance: 2,
+						},
+						{
+							ID:           4,
+							Text:         "Рассказать о бонусах для сотрудников",
+							Significance: 4,
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, userCase := range userCases {
